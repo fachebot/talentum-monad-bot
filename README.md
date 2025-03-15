@@ -2,6 +2,8 @@
 
 Talentum Monad 测试网领水机器人，每日自动领取 0.3 个 MON 测试代币。如果领取失败，将自动进行重试。
 
+<img width="1427" alt="2" src="https://github.com/user-attachments/assets/872b28ad-ad19-4a56-bc87-12ca7b9c8bb3" />
+
 请注意：**此脚本旨在免去每日手动领取水源的繁琐，但并不能跳过 Talentum 领水的条件限制**。领水钱包地址必须满足以下必要条件：
 
 1. 完成任意 10 个 Talentum 任务
