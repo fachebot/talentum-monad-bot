@@ -28,9 +28,9 @@ pip3 install -r requirements.txt
 复制示例配置文件以进行初始化：
 
 ```bash
-cp config/keys.json.simple config/keys.json
-cp config/proxy.json.simple config/proxy.json
-cp config/tokens.json.simple config/tokens.json
+cp config/keys.json.sample config/keys.json
+cp config/proxy.json.sample config/proxy.json
+cp config/tokens.json.sample config/tokens.json
 ```
 
 ### 3. 配置 Talentum 账号
