@@ -50,9 +50,10 @@ def unix_timestamp():
     return ts
 
 
-def faucets(requests: cloudscraper.CloudScraper, bearer_token: str, wallet_id: str):
+def faucets(bearer_token: str, wallet_id: str):
     payload = {"user_wallet_address_id": wallet_id}
     url = f"https://monad-api.talentum.id/api/faucets"
+    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
     resp = requests.post(
         url,
         headers={
@@ -64,8 +65,9 @@ def faucets(requests: cloudscraper.CloudScraper, bearer_token: str, wallet_id: s
     return handle_response(resp)
 
 
-def checkin_faucets(requests: cloudscraper.CloudScraper, bearer_token: str):
+def checkin_faucets(bearer_token: str):
     url = f"https://monad-api.talentum.id/api/faucets"
+    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
     resp = requests.get(
         url,
         headers={
@@ -77,8 +79,9 @@ def checkin_faucets(requests: cloudscraper.CloudScraper, bearer_token: str):
     return int(data["seconds_to_next_checkin"])
 
 
-def get_wallet_addresses(requests: cloudscraper.CloudScraper, bearer_token: str):
+def get_wallet_addresses(bearer_token: str):
     url = f"https://monad-api.talentum.id/api/v2/wallet-addresses"
+    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
     resp = requests.get(
         url,
         headers={
@@ -99,8 +102,6 @@ def main():
 
     while True:
         for token in bearer_tokens:
-            requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-
             if token in next_checkin_dict:
                 ts = unix_timestamp()
                 next_checkin = next_checkin_dict.get(token)
@@ -109,10 +110,11 @@ def main():
 
             if not token in wallet_addresses:
                 try:
-                    wallet = get_wallet_addresses(requests, token)
+                    wallet = get_wallet_addresses(token)
                     wallet_id = wallet["id"]
                     wallet_address = wallet["address"]
-                    wallet_addresses.update({token: (wallet_id, wallet_address)})
+                    wallet_addresses.update(
+                        {token: (wallet_id, wallet_address)})
                 except Exception as e:
                     logging.error(f"获取钱包地址失败, {str(e)}")
                     time.sleep(30)
@@ -122,10 +124,11 @@ def main():
 
             if token not in next_checkin_dict:
                 try:
-                    seconds_to_next_checkin = checkin_faucets(requests, token)
+                    seconds_to_next_checkin = checkin_faucets(token)
                     if seconds_to_next_checkin > 0:
                         ts = unix_timestamp()
-                        next_checkin_dict.update({token: ts + seconds_to_next_checkin})
+                        next_checkin_dict.update(
+                            {token: ts + seconds_to_next_checkin})
                         logging.info(
                             f"{wallet_address} 还需等待 {seconds_to_next_checkin} 秒"
                         )
@@ -138,7 +141,7 @@ def main():
 
             try:
                 logging.info(f"{wallet_address} 开始领水")
-                result = faucets(requests, token, wallet_id)
+                result = faucets(token, wallet_id)
 
                 next_checkin_dict.pop(token, None)
                 logging.info(f"{wallet_address} 领水成功, {result}")

@@ -49,8 +49,9 @@ def handle_response(resp):
         raise Exception(f"status_code: {resp.status_code}")
 
 
-def get_signature(requests: cloudscraper.CloudScraper, address: str):
+def get_signature(address: str):
     payload = {"address": address, "type": "METAMASK"}
+    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
     resp = requests.post(
         "https://monad-api.talentum.id/api/auth/signature", json=payload, proxies=proxy
     )
@@ -59,11 +60,11 @@ def get_signature(requests: cloudscraper.CloudScraper, address: str):
 
 
 def verify_signature(
-    requests: cloudscraper.CloudScraper,
     session_id: str,
     signature: str,
 ):
     payload = {"session_id": session_id, "signature": signature}
+    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
     resp = requests.post(
         "https://monad-api.talentum.id/api/auth/verify-signature",
         json=payload,
@@ -179,15 +180,13 @@ def main():
         account = Eth.account.from_key(pk)
 
         try:
-            requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-            sig = get_signature(requests, account.address)
+            sig = get_signature(account.address)
 
             message = encode_defunct(text=sig["message"])
             signed_message = Eth.account.sign_message(message, private_key=pk)
 
-            result = verify_signature(
-                requests, sig["session_id"], signed_message.signature.hex()
-            )
+            result = verify_signature(sig["session_id"], signed_message.signature.hex()
+                                      )
 
             tokens.append("Bearer " + result["access_token"])
             logging.info(f"{account.address} 登录成功, 已记录Bearer Token")
