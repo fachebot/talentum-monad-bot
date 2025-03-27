@@ -51,12 +51,12 @@ def handle_response(resp):
 
 def get_signature(address: str):
     payload = {"address": address, "type": "METAMASK"}
-    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-    resp = requests.post(
-        "https://monad-api.talentum.id/api/auth/signature", json=payload, proxies=proxy
-    )
-    data = handle_response(resp)
-    return data
+    with cloudscraper.create_scraper(disableCloudflareV1=False) as scraper:
+        resp = scraper.post(
+            "https://monad-api.talentum.id/api/auth/signature", json=payload, proxies=proxy
+        )
+        data = handle_response(resp)
+        return data
 
 
 def verify_signature(
@@ -64,14 +64,14 @@ def verify_signature(
     signature: str,
 ):
     payload = {"session_id": session_id, "signature": signature}
-    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-    resp = requests.post(
-        "https://monad-api.talentum.id/api/auth/verify-signature",
-        json=payload,
-        proxies=proxy,
-    )
-    data = handle_response(resp)
-    return data
+    with cloudscraper.create_scraper(disableCloudflareV1=False) as scraper:
+        resp = scraper.post(
+            "https://monad-api.talentum.id/api/auth/verify-signature",
+            json=payload,
+            proxies=proxy,
+        )
+        data = handle_response(resp)
+        return data
 
 
 def load_from_keys_json():

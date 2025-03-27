@@ -53,44 +53,44 @@ def unix_timestamp():
 def faucets(bearer_token: str, wallet_id: str):
     payload = {"user_wallet_address_id": wallet_id}
     url = f"https://monad-api.talentum.id/api/faucets"
-    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-    resp = requests.post(
-        url,
-        headers={
-            "authorization": bearer_token,
-        },
-        json=payload,
-        proxies=proxy,
-    )
-    return handle_response(resp)
+    with cloudscraper.create_scraper(disableCloudflareV1=False) as scraper:
+        resp = scraper.post(
+            url,
+            headers={
+                "authorization": bearer_token,
+            },
+            json=payload,
+            proxies=proxy,
+        )
+        return handle_response(resp)
 
 
 def checkin_faucets(bearer_token: str):
     url = f"https://monad-api.talentum.id/api/faucets"
-    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-    resp = requests.get(
-        url,
-        headers={
-            "authorization": bearer_token,
-        },
-        proxies=proxy,
-    )
-    data = handle_response(resp)
-    return int(data["seconds_to_next_checkin"])
+    with cloudscraper.create_scraper(disableCloudflareV1=False) as scraper:
+        resp = scraper.get(
+            url,
+            headers={
+                "authorization": bearer_token,
+            },
+            proxies=proxy,
+        )
+        data = handle_response(resp)
+        return int(data["seconds_to_next_checkin"])
 
 
 def get_wallet_addresses(bearer_token: str):
     url = f"https://monad-api.talentum.id/api/v2/wallet-addresses"
-    requests = cloudscraper.create_scraper(disableCloudflareV1=False)
-    resp = requests.get(
-        url,
-        headers={
-            "authorization": bearer_token,
-        },
-        proxies=proxy,
-    )
-    wallets = handle_response(resp)
-    return wallets[0]
+    with cloudscraper.create_scraper(disableCloudflareV1=False) as scraper:
+        resp = scraper.get(
+            url,
+            headers={
+                "authorization": bearer_token,
+            },
+            proxies=proxy,
+        )
+        wallets = handle_response(resp)
+        return wallets[0]
 
 
 def main():
